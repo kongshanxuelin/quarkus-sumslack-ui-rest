@@ -5,6 +5,10 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 [sumslack ui](https://ui.sumslack.com/)的配套后台Rest，为ui提供动态数据，通过js或python脚本提供后台服务。
 
 sumslack ui: https://ui.sumslack.com/
+
+<img width="951" height="370" alt="image" src="https://github.com/user-attachments/assets/6e0ee118-9583-4f7f-b7eb-61b83bd6ca2d" />
+
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
