@@ -1,0 +1,5 @@
+:HL["/bb/_next/static/chunks/0thyvfb~kg9x0.css","style"]
+:HL["/bb/_next/static/chunks/0ww-dhw7_5ipg.css","style"]
+:HL["/bb/_next/static/chunks/0duim~1qzhb~2.css","style"]
+:HL["/bb/_next/static/chunks/0mtcuu7cd2iei.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"(protected)","param":null,"prefetchHints":0,"slots":{"children":{"name":"mgr-script","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"mq66HLmWML1JX7I3Xha1T"}

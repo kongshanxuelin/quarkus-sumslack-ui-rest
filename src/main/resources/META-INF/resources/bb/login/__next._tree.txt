@@ -1,0 +1,4 @@
+:HL["/bb/_next/static/chunks/0thyvfb~kg9x0.css","style"]
+:HL["/bb/_next/static/chunks/0ww-dhw7_5ipg.css","style"]
+:HL["/bb/_next/static/chunks/0duim~1qzhb~2.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":24,"slots":{"children":{"name":"(public)","param":null,"prefetchHints":8,"slots":{"children":{"name":"login","param":null,"prefetchHints":4,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"mq66HLmWML1JX7I3Xha1T"}
