@@ -20,17 +20,19 @@ public class ScriptExecutor {
 
     public Object execute(String scriptCode, String scriptType, ExecRequest params) {
         try (Context context = Context.newBuilder(scriptType.toLowerCase())
-                .allowHostAccess(HostAccess.newBuilder(HostAccess.EXPLICIT)
+                .allowHostAccess(HostAccess.newBuilder()
+                        .allowAllClassImplementations(true)
+                        .allowAllImplementations(true)
                         .allowMapAccess(true)
                         .allowListAccess(true)
                         .allowArrayAccess(true)
+                        .allowPublicAccess(true)
                         .build())
                 .allowHostClassLookup(className -> false)
                 .allowIO(false)
                 .allowCreateThread(false)
                 .allowNativeAccess(false)
                 .allowCreateProcess(false)
-//                .allowHostAccess(HostAccess.ALL)
                 .build()) {
 
             Value bindings = context.getBindings(scriptType.toLowerCase());

@@ -1,3 +1,3 @@
 (function(){
-    return 1;
+    return params.params.id;
 })()

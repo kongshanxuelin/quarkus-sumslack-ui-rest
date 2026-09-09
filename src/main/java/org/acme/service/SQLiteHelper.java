@@ -1,6 +1,7 @@
 package org.acme.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import org.graalvm.polyglot.HostAccess;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -59,10 +60,12 @@ public class SQLiteHelper {
     }
 
     // execute 方法
+    @HostAccess.Export
     public boolean execute(String sql) {
         return execute(null, sql);
     }
 
+    @HostAccess.Export
     public boolean execute(String dbName, String sql) {
         try (Statement stmt = getConnection(dbName).createStatement()) {
             return stmt.execute(sql);
@@ -72,10 +75,12 @@ public class SQLiteHelper {
     }
 
     // update 方法
+    @HostAccess.Export
     public int update(String sql) {
         return update(null, sql);
     }
 
+    @HostAccess.Export
     public int update(String dbName, String sql) {
         try (Statement stmt = getConnection(dbName).createStatement()) {
             return stmt.executeUpdate(sql);
@@ -85,10 +90,12 @@ public class SQLiteHelper {
     }
 
     // query 方法
+    @HostAccess.Export
     public List<Map<String, Object>> query(String sql) {
         return query(null, sql);
     }
 
+    @HostAccess.Export
     public List<Map<String, Object>> query(String dbName, String sql) {
         List<Map<String, Object>> results = new ArrayList<>();
         try (Statement stmt = getConnection(dbName).createStatement();
@@ -111,20 +118,24 @@ public class SQLiteHelper {
     }
 
     // queryOne 方法
+    @HostAccess.Export
     public Map<String, Object> queryOne(String sql) {
         return queryOne(null, sql);
     }
 
+    @HostAccess.Export
     public Map<String, Object> queryOne(String dbName, String sql) {
         List<Map<String, Object>> results = query(dbName, sql);
         return results.isEmpty() ? null : results.get(0);
     }
 
     // insert 方法
+    @HostAccess.Export
     public int insert(String table, Map<String, Object> data) {
         return insert(null, table, data);
     }
 
+    @HostAccess.Export
     public int insert(String dbName, String table, Map<String, Object> data) {
         if (data == null || data.isEmpty()) {
             throw new RuntimeException("插入数据不能为空");
@@ -157,10 +168,12 @@ public class SQLiteHelper {
     }
 
     // delete 方法
+    @HostAccess.Export
     public int delete(String table, String where) {
         return delete(null, table, where);
     }
 
+    @HostAccess.Export
     public int delete(String dbName, String table, String where) {
         String sql = "DELETE FROM " + table;
         if (where != null && !where.trim().isEmpty()) {
@@ -170,10 +183,12 @@ public class SQLiteHelper {
     }
 
     // updateRecords 方法
+    @HostAccess.Export
     public int updateRecords(String table, Map<String, Object> data, String where) {
         return updateRecords(null, table, data, where);
     }
 
+    @HostAccess.Export
     public int updateRecords(String dbName, String table, Map<String, Object> data, String where) {
         if (data == null || data.isEmpty()) {
             throw new RuntimeException("更新数据不能为空");
@@ -205,20 +220,24 @@ public class SQLiteHelper {
     }
 
     // createTable 方法
+    @HostAccess.Export
     public void createTable(String tableName, String columnsDef) {
         createTable(null, tableName, columnsDef);
     }
 
+    @HostAccess.Export
     public void createTable(String dbName, String tableName, String columnsDef) {
         String sql = "CREATE TABLE IF NOT EXISTS " + tableName + " (" + columnsDef + ")";
         execute(dbName, sql);
     }
 
     // queryWithParams 方法
+    @HostAccess.Export
     public List<Map<String, Object>> queryWithParams(String sql, Object[] params) {
         return queryWithParams(null, sql, params);
     }
 
+    @HostAccess.Export
     public List<Map<String, Object>> queryWithParams(String dbName, String sql, Object[] params) {
         List<Map<String, Object>> results = new ArrayList<>();
         try (PreparedStatement pstmt = getConnection(dbName).prepareStatement(sql)) {
