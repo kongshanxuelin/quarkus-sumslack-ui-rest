@@ -23,7 +23,7 @@ public class ScriptExecResource {
     ScriptExecutor scriptExecutor;
 
     @POST
-    @Path("/{id}")
+    @Path("/{id: .*}")
     public ExecResponse execute(@PathParam("id") String id, ExecRequest request) {
         try {
             // 查找脚本文件

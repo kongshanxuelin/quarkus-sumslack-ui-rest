@@ -11,6 +11,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.acme.dto.ExecResponse;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,39 +28,86 @@ public class ScriptResource {
     @GET
     @Path("/list")
     public ExecResponse list() {
+        return listInternal(null);
+    }
+
+    @GET
+    @Path("/list/{path: .*}")
+    public ExecResponse listByPath(@PathParam("path") String path) {
+        return listInternal(path);
+    }
+
+    private ExecResponse listInternal(String subPath) {
         try {
             java.nio.file.Path scriptsDir = Paths.get(SCRIPTS_DIR);
+            if (subPath != null && !subPath.isEmpty()) {
+                scriptsDir = scriptsDir.resolve(subPath);
+            }
             if (!Files.exists(scriptsDir)) {
                 Files.createDirectories(scriptsDir);
                 return ExecResponse.success(new ArrayList<>());
             }
 
-            List<Map<String, Object>> scripts = new ArrayList<>();
-            try (Stream<java.nio.file.Path> paths = Files.list(scriptsDir)) {
-                paths.filter(Files::isRegularFile)
-                     .filter(p -> {
-                         String name = p.getFileName().toString();
-                         return name.endsWith(".js") || name.endsWith(".py") || name.endsWith(".mjs");
-                     })
-                     .forEach(p -> {
-                         Map<String, Object> info = new HashMap<>();
-                         String fileName = p.getFileName().toString();
-                         info.put("id", getNameWithoutExtension(fileName));
-                         info.put("fileName", fileName);
-                         info.put("type", getScriptType(fileName));
-                         info.put("size", getFileSize(p));
-                         info.put("lastModified", getLastModified(p));
-                         scripts.add(info);
-                     });
-            }
-            return ExecResponse.success(scripts);
+            List<Map<String, Object>> result = buildTree(scriptsDir);
+            return ExecResponse.success(result);
         } catch (IOException e) {
             return ExecResponse.error("列出脚本失败: " + e.getMessage());
         }
     }
 
+    private String formatNodeId(String id){
+//        return id.replaceAll("\\/","_");
+        return id;
+    }
+
+    private List<Map<String, Object>> buildTree(java.nio.file.Path dir) throws IOException {
+        List<Map<String, Object>> items = new ArrayList<>();
+
+        // 用于存储目录及其子项
+        Map<String, Map<String, Object>> dirMap = new LinkedHashMap<>();
+
+        try (Stream<java.nio.file.Path> paths = Files.list(dir)) {
+            List<java.nio.file.Path> pathList = paths.sorted().toList();
+
+            for (java.nio.file.Path p : pathList) {
+                String name = p.getFileName().toString();
+
+                if (Files.isDirectory(p)) {
+                    // 目录
+                    String relativePath = getRelativePath(Paths.get(SCRIPTS_DIR), p);
+                    Map<String, Object> dirInfo = new LinkedHashMap<>();
+                    dirInfo.put("id", formatNodeId(relativePath));
+                    dirInfo.put("name", name);
+                    dirInfo.put("type", "directory");
+                    dirInfo.put("isLeaf",false);
+                    dirInfo.put("children", buildTree(p));
+                    items.add(dirInfo);
+                } else if (isScriptFile(name)) {
+                    // 脚本文件
+                    String relativePath = getRelativePath(Paths.get(SCRIPTS_DIR), p);
+                    String id = getNameWithoutExtension(relativePath);
+                    Map<String, Object> fileInfo = new LinkedHashMap<>();
+                    fileInfo.put("id", formatNodeId(id));
+                    fileInfo.put("name", name);
+                    fileInfo.put("type", "script");
+                    fileInfo.put("isLeaf",true);
+                    fileInfo.put("scriptType", getScriptType(name));
+                    fileInfo.put("size", getFileSize(p));
+                    fileInfo.put("lastModified", getLastModified(p));
+                    items.add(fileInfo);
+                }
+            }
+        }
+
+        return items;
+    }
+
+    private boolean isScriptFile(String name) {
+        return name.endsWith(".js") || name.endsWith(".py") || name.endsWith(".mjs");
+    }
+
     @GET
-    @Path("/{id}")
+    @Path("/{id: .*}")
     public ExecResponse get(@PathParam("id") String id) {
         try {
             java.nio.file.Path scriptFile = findScriptFile(id);
@@ -67,9 +115,11 @@ public class ScriptResource {
                 return ExecResponse.error("脚本不存在: " + id);
             }
 
+            String relativePath = getRelativePath(Paths.get(SCRIPTS_DIR), scriptFile);
             Map<String, Object> result = new HashMap<>();
             result.put("id", id);
             result.put("fileName", scriptFile.getFileName().toString());
+            result.put("path", relativePath);
             result.put("type", getScriptType(scriptFile.getFileName().toString()));
             result.put("content", Files.readString(scriptFile));
             result.put("size", getFileSize(scriptFile));
@@ -87,40 +137,29 @@ public class ScriptResource {
         String id = request.get("id");
         String content = request.get("content");
         String type = request.getOrDefault("type", "js");
-
+        String path = request.get("path");
         if (id == null || id.trim().isEmpty()) {
             return ExecResponse.error("脚本ID不能为空");
         }
         if (content == null) {
-            return ExecResponse.error("脚本内容不能为空");
+            content = getDefaultContent(type);
         }
 
         try {
-            java.nio.file.Path scriptsDir = Paths.get(SCRIPTS_DIR);
-            if (!Files.exists(scriptsDir)) {
-                Files.createDirectories(scriptsDir);
-            }
-
+            java.nio.file.Path scriptsDir = Paths.get(SCRIPTS_DIR + File.separator + path);
             String extension = getExtension(type);
             java.nio.file.Path scriptFile = scriptsDir.resolve(id + extension);
 
             if (Files.exists(scriptFile)) {
                 return ExecResponse.error("脚本已存在: " + id);
             }
-            if(type.equals("js")){
-                content = """
-(function(){
-    //TODO:params可以获取网页参数
-})()
-""";
-            }else if(type.equals("py")){
-                content = """
-def ok(params):
-    //TODO:params可以获取网页参数
-    return "hello"
-ok(params)
-""";
+
+            // 确保父目录存在
+            java.nio.file.Path parentDir = scriptFile.getParent();
+            if (parentDir != null && !Files.exists(parentDir)) {
+                Files.createDirectories(parentDir);
             }
+
             Files.writeString(scriptFile, content);
             return ExecResponse.success(Map.of("id", id, "fileName", scriptFile.getFileName().toString()));
         } catch (IOException e) {
@@ -128,8 +167,52 @@ ok(params)
         }
     }
 
+    @POST
+    @Path("/mkdir")
+    public ExecResponse mkdir(Map<String, String> request) {
+        String name = request.get("name");
+        String path = request.get("path");
+
+        if (name == null || name.trim().isEmpty()) {
+            return ExecResponse.error("目录名不能为空");
+        }
+
+        // 不允许目录名包含路径分隔符
+        if (name.contains("/") || name.contains("\\")) {
+            return ExecResponse.error("目录名不能包含路径分隔符");
+        }
+
+        try {
+            java.nio.file.Path scriptsDir = Paths.get(SCRIPTS_DIR);
+            java.nio.file.Path targetDir;
+
+            if (path != null && !path.trim().isEmpty()) {
+                targetDir = scriptsDir.resolve(path).resolve(name);
+            } else {
+                targetDir = scriptsDir.resolve(name);
+            }
+
+            // 检查是否已存在
+            if (Files.exists(targetDir)) {
+                return ExecResponse.error("目录已存在: " + name);
+            }
+
+            Files.createDirectories(targetDir);
+
+            String relativePath = getRelativePath(scriptsDir, targetDir);
+            return ExecResponse.success(Map.of(
+                "id", relativePath,
+                "name", name,
+                "type", "directory",
+                "isLeaf", false
+            ));
+        } catch (IOException e) {
+            return ExecResponse.error("创建目录失败: " + e.getMessage());
+        }
+    }
+
     @PUT
-    @Path("/{id}")
+    @Path("/{id: .*}")
     public ExecResponse update(@PathParam("id") String id, Map<String, String> request) {
         String content = request.get("content");
         String type = request.get("type");
@@ -172,7 +255,7 @@ ok(params)
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("/{id: .*}")
     public ExecResponse delete(@PathParam("id") String id) {
         try {
             java.nio.file.Path scriptFile = findScriptFile(id);
@@ -185,6 +268,24 @@ ok(params)
         } catch (IOException e) {
             return ExecResponse.error("删除脚本失败: " + e.getMessage());
         }
+    }
+
+    private String getDefaultContent(String type) {
+        if ("js".equals(type)) {
+            return """
+(function(){
+    //TODO:params可以获取网页参数
+})()
+""";
+        } else if ("py".equals(type)) {
+            return """
+def ok(params):
+    #TODO:params可以获取网页参数
+    return "hello"
+ok(params)
+""";
+        }
+        return "";
     }
 
     private java.nio.file.Path findScriptFile(String id) {
@@ -201,6 +302,10 @@ ok(params)
             }
         }
         return null;
+    }
+
+    private String getRelativePath(java.nio.file.Path base, java.nio.file.Path file) {
+        return base.relativize(file).toString().replace("\\", "/");
     }
 
     private String getNameWithoutExtension(String fileName) {

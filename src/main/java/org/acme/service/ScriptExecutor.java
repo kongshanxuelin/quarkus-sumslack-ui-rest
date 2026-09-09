@@ -30,6 +30,7 @@ public class ScriptExecutor {
                 .allowCreateThread(false)
                 .allowNativeAccess(false)
                 .allowCreateProcess(false)
+//                .allowHostAccess(HostAccess.ALL)
                 .build()) {
 
             Value bindings = context.getBindings(scriptType.toLowerCase());
