@@ -2,13 +2,14 @@
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
+> 本项目后端代码基于Quarkus skill由AI生成，前端代码基于[sumslack ui](https://ui.sumslack.com/) skill由AI生成，全程无人工编码。
+
 [sumslack ui](https://ui.sumslack.com/)的配套后台Rest，为ui提供动态数据，通过js或python脚本提供后台服务。
 
 sumslack ui: https://ui.sumslack.com/
 sumslack ui server： https://s.sumslack.com/bb/
 
 <img width="951" height="370" alt="image" src="https://github.com/user-attachments/assets/6e0ee118-9583-4f7f-b7eb-61b83bd6ca2d" />
-
 
 ## Running the application in dev mode
 
