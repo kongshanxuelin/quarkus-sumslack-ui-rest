@@ -121,13 +121,16 @@ public class NbProviderWebSocketGateway {
      */
     private WebSocketMessage dispatch(Session session, String type, Object payload) {
         switch (type) {
-            case "ping":
+            case "heartbeat":
                 return handlePing(session, payload);
             case "subscribe":
+            case "subscribe_message":
                 return handleSubscribe(session, payload);
             case "unsubscribe":
+            case "unsubscribe_message":
                 return handleUnsubscribe(session, payload);
             case "broadcast":
+            case "socket_message":
                 return handleBroadcast(session, payload);
             default:
                 return handleDefault(session, type, payload);

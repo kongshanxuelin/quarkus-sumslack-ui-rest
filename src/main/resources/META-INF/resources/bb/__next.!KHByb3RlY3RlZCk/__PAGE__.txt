@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
-3:I[19921,["/bb/_next/static/chunks/06xjho~rcx74g.js","/bb/_next/static/chunks/0s2mcgo_m0fgx.js","/bb/_next/static/chunks/0_w6upqxr9mx6.js"],"OutletBoundary"]
+3:I[19921,["/bb/_next/static/chunks/00bj9-ccmwe1s.js","/bb/_next/static/chunks/0d5qyzk-al9o7.js","/bb/_next/static/chunks/0_w6upqxr9mx6.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":["$L2",null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"RmZrXni652Mqh2pJBfCHq"}
+0:{"rsc":["$","$1","c",{"children":["$L2",null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"2Ne3-a5f7mr-55CwGlmv0"}
 5:null
 2:E{"digest":"NEXT_REDIRECT;replace;/mgr-script;307;"}

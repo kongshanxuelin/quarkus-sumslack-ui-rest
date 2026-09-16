@@ -18,6 +18,12 @@ public class ScriptExecutor {
     @Inject
     SQLiteHelper db;
 
+    @Inject
+    HttpHelper http;
+
+    @Inject
+    WebSockHelper ws;
+
     public Object execute(String scriptCode, String scriptType, ExecRequest params) {
         try (Context context = Context.newBuilder(scriptType.toLowerCase())
                 .allowHostAccess(HostAccess.newBuilder()
@@ -41,6 +47,8 @@ public class ScriptExecutor {
             Map<String, Object> paramsMap = convertRequestToMap(params);
             bindings.putMember("params", paramsMap);
             bindings.putMember("db", db);
+            bindings.putMember("http", http);
+            bindings.putMember("ws",ws);
 
             Value result = context.eval(scriptType.toLowerCase(), scriptCode);
 

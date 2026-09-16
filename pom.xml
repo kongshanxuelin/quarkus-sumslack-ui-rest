@@ -33,6 +33,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.40.994.ALL</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>
@@ -98,6 +104,17 @@
     </dependencies>
 
     <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>阿里云仓库</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>maven-central-direct</id>
             <url>https://repo.maven.apache.org/maven2</url>
@@ -174,4 +191,14 @@
             </properties>
         </profile>
     </profiles>
+
+    <!-- 插件仓库 -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun-plugin</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
